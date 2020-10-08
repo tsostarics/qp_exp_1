@@ -1,0 +1,4 @@
+"rt","stimulus","button_pressed","trial_type","trial_index","time_elapsed","internal_node_id","response"
+"2494.590000016615","Recent versions of Chrome require the user to interact with a page before it can play audio. Clicking the button below counts as an interaction. Be aware of this when planning audio experiments if you want the first trial to include audio.","0","html-button-response","0","2497","0.0-0.0",""
+"9111.17500020191","sound/ex_1_nominated.wav","","audio-text-scale-response","1","11877","0.0-1.0","{""Q0"":""sdfa"",""Q1"":""wefa"",""Acceptability"":2}"
+"6933.225000044331","sound/ex_2_amelia.wav","","audio-text-scale-response","2","19081","0.0-2.0","{""Q0"":""wegw"",""Q1"":""hrthrthr"",""Acceptability"":4}"
