@@ -41,7 +41,7 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
           required: {
             type: jsPsych.plugins.parameterType.BOOL,
             pretty_name: 'Required',
-            default: true,
+            default: false,
             description: 'Makes answering the question required.'
           },
           name: {
@@ -181,8 +181,7 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
         ".jspsych-survey-likert-opts li { display:inline-block; /*width:19%;*/ text-align:center; vertical-align: top; }"+
         ".jspsych-survey-likert-opts li input[type=radio] { display:block; position:relative; top:0; left:50%; margin-left:-6px; }"
       html += '</style>';
-      
-      
+  
       // show preamble text
       if(trial.preamble !== null){
         html += '<div id="jspsych-survey-likert-preamble" class="jspsych-survey-likert-preamble">'+trial.preamble+'</div>';
@@ -199,10 +198,9 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
       if(trial.randomize_question_order){
         scale_question_order = jsPsych.randomization.shuffle(question_order);
       }
-
+      
       for (var i = 0; i < trial.scale_questions.length; i++) {
         var question = trial.scale_questions[scale_question_order[i]];
-        console.log(question.required)
         // add scale question
         html += '<label class="jspsych-survey-likert-statement">' + question.prompt + '</label>';
         // add scale options
@@ -247,9 +245,6 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
       }
       html += '</div>';
     }
-    
-    // html += '<audio id=\"'+ trial.stimulus.slice(5) + '\" srch=\"' + trial.stimulus + '\"></audio>'
-    // html += '<button onclick=\"document.getElementByID(\''+ trial.stimulus.slice(5) + '\').play()\">Play!</button>'
 
     // add submit button
     if(trial.display_button){
@@ -257,10 +252,6 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
     }
 
     html += '</form>'
-
-    // Code to add a button, in case we need to modify the setup later!
-    // html += '<audio id=\"sound1\" src=' + trial.stimulus + '></audio>'
-    // html += '<button onclick=\"document.getElementById(\'sound1\').play();\">Play</button>'
 
     // Display the html we've built for the trial
     display_element.innerHTML = html;
@@ -329,7 +320,6 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
 
     });
 
-    
   // End trial function
   function end_trial(){
 
@@ -364,7 +354,7 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
   } else {
     audio.play();
   }
-  
+
   // end trial if trial_duration is set
   if (trial.trial_duration !== null) {
     jsPsych.pluginAPI.setTimeout(function() {

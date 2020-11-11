@@ -1,17 +1,34 @@
-jsPsych.plugins['audio-text-scale-response'] = (function() {
+jsPsych.plugins['audio-buttons-text'] = (function() {
   var plugin = {};
   
-	jsPsych.pluginAPI.registerPreload('audio-text-scale-response', 'stimulus', 'audio');
+	jsPsych.pluginAPI.registerPreload('audio-buttons-text', 'stimulus', 'audio');
 
   plugin.info = {
-		name: 'audio-text-scale-response',
+		name: 'audio-buttons-text',
 		description: '',
     parameters: {
+      aud_buttons: {
+        type:jsPsych.plugins.parameterType.BOOL,
+        array: true,
+        pretty_name: "Audio Buttons",
+        nested: {
+          aud_file: {
+            jsPsych.plugins.parameterType.AUDIO,
+            default: undefined,
+            description: 'The audio file to play when the button is clicked'
+          },
+          label: {
+            jsPsych.plugins.parameterType.STRING,
+            default: 'Play',
+            description: 'The label on the button.'
+          }
+        }
+      },
       stimulus: {
         type: jsPsych.plugins.parameterType.AUDIO,
         pretty_name: 'Stimulus',
         default: undefined,
-        description: 'The image to be displayed'
+        description: 'The audio to be played'
       },
       trial_duration: {
         type: jsPsych.plugins.parameterType.INT,
@@ -259,8 +276,8 @@ jsPsych.plugins['audio-text-scale-response'] = (function() {
     html += '</form>'
 
     // Code to add a button, in case we need to modify the setup later!
-    // html += '<audio id=\"sound1\" src=' + trial.stimulus + '></audio>'
-    // html += '<button onclick=\"document.getElementById(\'sound1\').play();\">Play</button>'
+    html += '<audio id=\"sound1\" src=' + trial.stimulus + '></audio>'
+    html += '<button class="jspsych-btn" onclick=\"document.getElementById(\'sound1\').play();\">Play</button>'
 
     // Display the html we've built for the trial
     display_element.innerHTML = html;
