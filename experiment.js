@@ -109,8 +109,9 @@ exp_timeline.push(demographics_2)
 var instructions = {
   type: 'html-button-response',
   stimulus: '<p>You will be listening to a series of conversations between a man and a woman. They have a close relationship with one another and value honesty. The man will end the conversation with one of two possible responses given by the buttons Choice A or Choice B</p>'+
+  '<p>Sometimes the way a sentence is said can convey more than the emotional state of a speaker, sometimes it can communicate a deeper meaning related to the context of the conversation it\'s said in.</p>' +
   '<p>On each trial, you will listen to the conversation, then use the buttons to hear <b>both</b> versions of the man\'s response. The transcript of the conversation will be provided but without any punctuation or capitalization.</p>'+
-  '<p>When you\'ve listened to each of the choices, you will be asked to write a short response on what the difference in meaning between the two choices is.</p>'+
+  '<p>When you\'ve listened to each of the choices, you will be asked to write a short response on what the difference in meaning, not emotion, between the two choices is.</p>'+
   '<p>You will also be asked to judge whether the man\'s response is expected by the woman.</p>'+
   '<p>Each conversation is to be treated as completely independant from one trial to the next.</p>'+
   '<p>When you are ready to start, you may press the button below.</p>',
@@ -119,8 +120,38 @@ var instructions = {
     jsPsych.setProgressBar(0);
   }
 }
-exp_timeline.push(instructions);
 
+var inst_quiz = {
+  type : 'quiz',
+  questions: [
+    {prompt: 'Which response should you listen to on each trial?', options: ['Choice A', 'Choice B', 'Both Choices'], required:true, name: 'quiz1', correct:2},
+    {prompt: 'When describing the difference in meaning between the two options, you should focus on:', options: ['What the man is intending to communicating with each response.','The emotional status of the man given the way he responds.'], required:true, name: 'quiz2', correct:0},
+    {prompt: 'Each conversation is independent from one trial to the next:', options: ['True','False'], required:true, name: 'quiz3', correct:0}
+  ],
+  button_label: 'Check Answers',
+  preamble: '<h3>Understanding Check</h3>\n<p>This is a short quiz to check your understanding of the instructions. If you do not get all questions correct, you will be redirected back to the instructions to review and try again.</p><p> If all answers are correct you will proceed directly to the experiment questions.</p>',
+  alert_incorrect: 2,
+}
+
+var looping_chunk = {
+	chunk_type: 'while',
+	timeline: [instructions, inst_quiz],
+	loop_function: function(data){
+    var should_proceed = data.values()[1].all_correct // look up if all answers were correct
+    if(should_proceed=='true') { return false; }
+		else { return true; }
+	}
+}
+exp_timeline.push(looping_chunk)
+
+var lets_begin = {
+  type: 'html-keyboard-response',
+  stimulus: "<p>Thank you for reading the instructions carefully. Press any key to begin the experiment.</p>",
+  response_ends_trial: true
+};
+exp_timeline.push(lets_begin)
+
+console.log(exp_timeline);
 // This is for updating the progress bar
 var incr_val = 0.025;
 var progress_counter = 0.00;
@@ -138,7 +169,7 @@ var trial_1 = {
     word: jsPsych.timelineVariable('word'),
     itemtype: jsPsych.timelineVariable('type')
   },
-  questions: [{prompt: "What is the difference in meaning between the way the speaker responds in Choice A and the way he responds in Choice B?", required: true}],
+  questions: [{prompt: "Other than the emotional state of the speaker, what do you think he's trying to communicate when he responds with Choice A or Choice B?", required: true}],
   preamble: jsPsych.timelineVariable('preamble'),
   on_finish: function(){
     progress_counter += incr_val
@@ -155,7 +186,7 @@ var trial_2 = {
     block: 2,
     word: jsPsych.timelineVariable('word'),
     itemtype: jsPsych.timelineVariable('type')
-  },  questions: [{prompt: "What is the difference in meaning between the way the speaker responds in Choice A and the way he responds in Choice B?", required: true}],
+  },  questions: [{prompt: "Other than the emotional state of the speaker, what do you think he's trying to communicate when he responds with Choice A or Choice B?", required: true}],
   preamble: jsPsych.timelineVariable('preamble'),
   on_finish: function(){
     progress_counter += incr_val

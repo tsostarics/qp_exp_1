@@ -81,7 +81,7 @@ trial_set_2 = [
 },
 {
 	preamble: "<p><i>happy valentines day guess what i got you</i></p><p><i>what is it</i></p><p><i>can you guess what it is</i></p><p><i>well since you know my pollen allergy is bad it can't be flowers what is it</i></p>",
-	aud_file: "sound/roses_pre_2.wav",
+	aud_file: "sound/roses_pre_1.wav",
 	choices: [{label: "Choice A", aud_file: "sound/roses_2.wav"}, {label: "Choice B", aud_file: "sound/roses_1.wav"}],
 	word: "roses",
 	type: "critical",
