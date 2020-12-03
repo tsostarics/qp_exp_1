@@ -1,28 +1,19 @@
 // Lets us save data
-// function saveData(filename, filedata){
-//     $.ajax({
-//       type:'post',
-//       cache: false,
-//       url: 'save_data.php',
-//       data: {filename: filename, filedata: filedata}
-//     });
-//   };
-
-
 function saveToFirebase(code, filedata){
   var ref = firebase.database().ref('users/' + code).set(filedata);
 }
 
-
-
 // Create our blank timeline
 var exp_timeline = [];
+
+// Get subject ID from URL parameters, generate a random number if unavailable
 var subID = jsPsych.data.getURLVariable('PROLIFIC_PID');
 if (typeof subID == 'undefined'){
   subID = String(Math.floor(Math.random() * 1000))
 }
 console.log(subID)
 
+// Welcome screen to start
 var welcome = {
   type: 'html-keyboard-response',
   stimulus: "<p>Welcome to our experiment! Press any key to continue.</p>",
@@ -43,8 +34,7 @@ var check_consent = function(elem) {
   return false;
 };
 
-
-// Create consent
+// Create consent trial
 var consent = {
   type:'external-html',
   url: "consent_form.html",
@@ -64,7 +54,7 @@ var sound_test = {
   button_label: "Next",
 };
 
-/**	This function plays the sound in the sound check **/
+// This function plays the sound in the sound check
 function playSound(){
 	var x = document.getElementById("testAudio");
 	x.play();
@@ -72,10 +62,11 @@ function playSound(){
 
 exp_timeline.push(sound_test);
 
-
+// Answer choices for the demographics survey
 var yn_scale = ["Yes","No"]
 var gender_scale = ["Male","Female","Non-binary"]
 
+// Multiple Choice questions
 var demographics_1 = {
   type: 'survey-multi-choice',
   preamble: '<h1>Pre-experiment survey</h1>\n<p>Please answer the following questions. Your answers are for informational purposes and will not prevent you from participating.</p>',
@@ -90,6 +81,7 @@ var demographics_1 = {
   button_label: "Next"
 }
 
+// Short answer questions
 var demographics_2 = {
   type: 'survey-text',
   preamble: '<h1>Pre experiment survey</h1>\n<p>Please answer the following questions. Your answers are for informational purposes and will not prevent you from participating.</p>',
@@ -106,6 +98,7 @@ var demographics_2 = {
 exp_timeline.push(demographics_1)
 exp_timeline.push(demographics_2)
 
+// Instructions for the experiment
 var instructions = {
   type: 'html-button-response',
   stimulus: '<p>You will be listening to a series of conversations between a man and a woman. They have a close relationship with one another and value honesty. The man will end the conversation with one of two possible responses given by the buttons Choice A or Choice B</p>'+
@@ -121,11 +114,12 @@ var instructions = {
   }
 }
 
+// Multiple choice quiz on the instructions
 var inst_quiz = {
   type : 'quiz',
   questions: [
     {prompt: 'Which response should you listen to on each trial?', options: ['Choice A', 'Choice B', 'Both Choices'], required:true, name: 'quiz1', correct:2},
-    {prompt: 'When describing the difference in meaning between the two options, you should focus on:', options: ['What the man is intending to communicating with each response.','The emotional status of the man given the way he responds.'], required:true, name: 'quiz2', correct:0},
+    {prompt: 'When describing the difference in meaning between the two options, you should focus on:', options: ['What the man is intending to communicate with each response.','The emotional status of the man given the way he responds.'], required:true, name: 'quiz2', correct:0},
     {prompt: 'Each conversation is independent from one trial to the next:', options: ['True','False'], required:true, name: 'quiz3', correct:0}
   ],
   button_label: 'Check Answers',
@@ -133,6 +127,8 @@ var inst_quiz = {
   alert_incorrect: 2,
 }
 
+// Loop between the instructions and the quiz until they get the quiz answer right
+// note: adds another row of data for every time they have to take the quiz
 var looping_chunk = {
 	chunk_type: 'while',
 	timeline: [instructions, inst_quiz],
@@ -144,6 +140,7 @@ var looping_chunk = {
 }
 exp_timeline.push(looping_chunk)
 
+// Begin experiment if they've passed the quiz
 var lets_begin = {
   type: 'html-keyboard-response',
   stimulus: "<p>Thank you for reading the instructions carefully. Press any key to begin the experiment.</p>",
@@ -152,12 +149,14 @@ var lets_begin = {
 exp_timeline.push(lets_begin)
 
 console.log(exp_timeline);
-// This is for updating the progress bar
+
+// Progress bar, increments by 2.5% each trial
 var incr_val = 0.025;
 var progress_counter = 0.00;
+
 /*
-This is the general container for each trial,
-will play an audio file and display a likert scale with 2 text boxes
+This is the general container for each block of trials
+will play an audio file and display a likert scale with 1 text box
 */
 var trial_1 = {
   type: 'audio-buttons',
@@ -173,7 +172,7 @@ var trial_1 = {
   preamble: jsPsych.timelineVariable('preamble'),
   on_finish: function(){
     progress_counter += incr_val
-    jsPsych.setProgressBar(progress_counter);
+    jsPsych.setProgressBar(progress_counter); // manually update progress bar each trial
   }
 }
 
@@ -202,17 +201,14 @@ every 10 participants. The switch statement will read in
 the correct sets of stimuli, which will be manually shuffled
 and passed to the media preloader later.
 */
-var LATIN_COND = 1; //CHANGE THIS ON SUBSEQUENT DEPLOYMENTS
+var LATIN_COND = 4; // CHANGE THIS ON SUBSEQUENT DEPLOYMENTS
 var block_1_stims = []
 var block_2_stims = []
 
 switch (LATIN_COND){
   case 1:
-  // console.log("start switch")
   block_1_stims = trial_set_1.concat(trial_set_5);
-  // console.log("mid switch");
   block_2_stims = trial_set_3.concat(trial_set_6);
-  // console.log("switch complete");   
   break;
   case 2:
   block_1_stims = trial_set_2.concat(trial_set_5);
@@ -231,33 +227,8 @@ switch (LATIN_COND){
   break;
 }
 
-// Keep this around for testing purposes
-// var trial_stims = [
-//   {
-//     preamble_text: "<i>Well, you know I'm allergic to citrus, so it can't be lemons or tangerines... What is it?</i>", 
-//     aud_file: 'sound/ex_1_nominated.wav', 
-//     choices: [{label: 'Choice A', aud_file: 'sound/ex_2_amelia.WAV'},
-//     {label: 'Choice B', aud_file: 'sound/ex_3_mangos.WAV'}]
-//   },
-//   {
-//     preamble_text: 'so1', 
-//     aud_file: 'sound/ex_2_amelia.WAV', 
-//     choices: [{label: 'C', aud_file: 'sound/ex_1_nominated.wav'},
-//     {label: 'D', aud_file: 'sound/ex_3_mangos.WAV'}]
-//   },
-//   {
-//     preamble_text: 'so1', 
-//     aud_file: 'sound/ex_3_mangos.WAV', 
-//     choices: [{label: 'amazing', aud_file: 'sound/ex_1_nominated.wav'},
-//     {label: 'wowee', aud_file: 'sound/ex_3_mangos.WAV'}]
-//   }
-// ];
-
-/* 
-for each stim/trial (stim) in the block, return the stimulus 
-audio file (stim.aud_file) as well as the audio for each choice 
-(ch.aud_file).
-*/
+ 
+// Get all of the audio file names to pass to the preloader
 function get_aud_files(block){
   file_strings = []
   var stim;
@@ -268,7 +239,7 @@ function get_aud_files(block){
   return file_strings
 }
 
-// Get the media to preload for both blocks
+// Pass filenames to preloader
 var media_to_preload = get_aud_files(block_1_stims)
 media_to_preload = media_to_preload.concat(get_aud_files(block_2_stims))
 
@@ -309,7 +280,7 @@ var block_notice = {
 };
 
 
-//Here's where we link the trial template to the stimuli for each block
+//Here's where we link the trials to the stimuli for each block
 var trial_loop_1 = {
   timeline : [trial_1],
   timeline_variables : block_1_stims
@@ -344,21 +315,21 @@ var submit_block = {
 }
 exp_timeline.push(submit_block);
 
-// Send user back to prolific
+// Send user back to prolific by displaying redirect.html
 var send_to_prolific = {
   type: 'external-html',
   url: 'redirect.html'
 }
 exp_timeline.push(send_to_prolific)
 
-
+// Run experiment
 jsPsych.init({
   timeline: exp_timeline,
   use_webaudio: false,
   preload_audio: media_to_preload,
   show_progress_bar: true,
-  auto_update_progress_bar: false,
-  show_preload_progress_bar: true, // show preload progress bar
+  auto_update_progress_bar: false, // manual progress bar updating
+  show_preload_progress_bar: true, 
   on_finish: function() {
     //   saveData("experiment_data.csv", jsPsych.data.get().csv());
     jsPsych.data.displayData();
